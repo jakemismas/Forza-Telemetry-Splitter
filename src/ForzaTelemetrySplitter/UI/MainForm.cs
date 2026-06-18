@@ -35,6 +35,18 @@ public sealed class MainForm : Form
     private readonly Dictionary<Destination, DestinationStatus> _statusCache = new();
     private readonly System.Windows.Forms.Timer _uiTimer = new();
 
+    private readonly ForzaProcessWatcher _gameWatcher = new();
+    private CheckBox? _autoSplit;
+    /// <summary>Display name of the Forza title the watcher currently sees, or null if none.</summary>
+    private string? _autoDetectedGame;
+    /// <summary>True while the engine was started by the watcher (vs. a manual Start).</summary>
+    private bool _autoStarted;
+    /// <summary>
+    /// Set when the user presses Stop while a game is still detected, so the watcher won't immediately
+    /// restart for that session. Cleared when the game process exits (session over) or on a manual Start.
+    /// </summary>
+    private bool _manualStopThisSession;
+
     // Index order of the language dropdown items.
     private static readonly AppLanguage[] _languageOrder =
     {
@@ -50,6 +62,12 @@ public sealed class MainForm : Form
 
     /// <summary>Raised when the engine's running state changes, so the tray can refresh its menu.</summary>
     public event Action? RunStateChanged;
+
+    /// <summary>
+    /// Raised when the process watcher auto-starts (string = detected game name) or auto-stops
+    /// (string = null) the splitter, so the tray can show a balloon naming the game.
+    /// </summary>
+    public event Action<string?>? AutoSplitNotice;
 
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public SplitterEngine Engine => _engine;
@@ -85,6 +103,12 @@ public sealed class MainForm : Form
         _uiTimer.Interval = 250; // ~4 Hz
         _uiTimer.Tick += (_, _) => UpdateStatus();
         _uiTimer.Start();
+
+        // Watch for a running Forza game and auto-start/stop splitting around its lifetime.
+        // Timer-based, so these handlers run on the UI thread.
+        _gameWatcher.GameDetected += OnGameDetected;
+        _gameWatcher.GameClosed += OnGameClosed;
+        _gameWatcher.Start();
     }
 
     private void BuildLayout()
@@ -358,6 +382,24 @@ public sealed class MainForm : Form
         host.Controls.Add(startupDesc);
         y = startupDesc.Bottom + gap + 12;
 
+        // Auto-start splitting while a Forza game is running (additive to Start with Windows).
+        _autoSplit = new CheckBox
+        {
+            Text = Strings.Settings_AutoSplit,
+            AutoSize = true,
+            Checked = _config.AutoSplitOnGameDetected,
+        };
+        _autoSplit.SetBounds(x, y, 420, 24);
+        _autoSplit.CheckedChanged += (_, _) =>
+        {
+            _config.AutoSplitOnGameDetected = _autoSplit.Checked;
+            ConfigStore.Save(_config);
+        };
+        host.Controls.Add(_autoSplit);
+        var autoSplitDesc = MakeDesc(Strings.Settings_AutoSplitDesc, x + 4, y + 24, host.ClientSize.Width - x - 24);
+        host.Controls.Add(autoSplitDesc);
+        y = autoSplitDesc.Bottom + gap + 12;
+
         // Speed unit.
         var unitLabel = new Label { Text = Strings.Settings_UnitDesc, AutoSize = false, Font = new Font("Segoe UI", 9f) };
         unitLabel.SetBounds(x, y + 3, 340, 20);
@@ -576,14 +618,53 @@ public sealed class MainForm : Form
         if (_engine.Running)
         {
             _engine.Stop();
+            _autoStarted = false;
+            // If the user stops while a game is still detected, honor that for the rest of this game
+            // session — the watcher must not immediately auto-restart. Cleared when the game exits.
+            if (_autoDetectedGame is not null) _manualStopThisSession = true;
         }
         else
         {
+            // A manual Start clears any prior manual-stop hold.
+            _manualStopThisSession = false;
             _engine.SetDestinations(_config.Destinations);
             _engine.Start(_config.ListenIp, _config.ListenPort);
         }
         UpdateStartStopButton();
         RunStateChanged?.Invoke();
+    }
+
+    private void OnGameDetected(string game)
+    {
+        _autoDetectedGame = game;
+        if (!_config.AutoSplitOnGameDetected) return;
+        if (_engine.Running) return;          // already splitting (manual or prior auto)
+        if (_manualStopThisSession) return;    // user opted out for this session
+
+        _engine.SetDestinations(_config.Destinations);
+        if (_engine.Start(_config.ListenIp, _config.ListenPort))
+        {
+            _autoStarted = true;
+            UpdateStartStopButton();
+            RunStateChanged?.Invoke();
+            AutoSplitNotice?.Invoke(game);
+        }
+        // A failed Start (e.g. port in use) already surfaced via the engine's PortInUse/ErrorOccurred
+        // events; don't claim an auto-start that didn't happen.
+    }
+
+    private void OnGameClosed()
+    {
+        _autoDetectedGame = null;
+        // The game session is over: a fresh launch should be free to auto-start again.
+        _manualStopThisSession = false;
+
+        if (!_autoStarted) return; // we didn't start it, so we don't stop it
+        _engine.Stop();
+        _autoStarted = false;
+        UpdateStartStopButton();
+        RunStateChanged?.Invoke();
+        AutoSplitNotice?.Invoke(null);
     }
 
     private void UpdateStartStopButton()
@@ -715,6 +796,14 @@ public sealed class MainForm : Form
                 readout);
             dotColor = Color.FromArgb(46, 204, 113); // green: receiving from the game
         }
+        else if (_autoStarted && _autoDetectedGame is { } game)
+        {
+            // The watcher started us and named the game, but no telemetry has arrived yet. Tell the
+            // user the game is seen and we're waiting (commonly: Data Out not turned on in-game),
+            // rather than claiming we're splitting when nothing is flowing.
+            text = Strings.Status_GameDetectedWaiting(game);
+            dotColor = Color.FromArgb(241, 196, 15);  // amber: running, waiting for telemetry
+        }
         else
         {
             text = Strings.Status_WaitingForForza(_config.ListenIp, _config.ListenPort);
@@ -758,6 +847,7 @@ public sealed class MainForm : Form
             return;
         }
         _uiTimer.Stop();
+        _gameWatcher.Dispose();
         base.OnFormClosing(e);
     }
 }

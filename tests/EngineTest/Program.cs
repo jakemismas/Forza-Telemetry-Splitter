@@ -368,6 +368,65 @@ Console.WriteLine("=== Forza Telemetry Splitter — engine verification ===\n");
     if (!ok) failures++;
 }
 
+// --- Test 13: Forza process detection (title map + debounce) ----------------------------
+{
+    Console.WriteLine("[Test 13] Forza process watcher: title mapping and debounce");
+
+    // Title map: every known process name (case-insensitive, with or without .exe) maps; unknown -> null.
+    var mapCases = new (string proc, string? expected)[]
+    {
+        ("ForzaHorizon4", "Forza Horizon 4"),
+        ("ForzaHorizon5", "Forza Horizon 5"),
+        ("ForzaHorizon6", "Forza Horizon 6"),
+        ("FORZAHORIZON6.EXE", "Forza Horizon 6"),     // case-insensitive + .exe suffix
+        ("ForzaMotorsport7", "Forza Motorsport 7"),
+        ("ForzaMotorsport", "Forza Motorsport"),
+        ("chrome", null),
+        ("notepad", null),
+    };
+    bool mapOk = true;
+    foreach (var (proc, expected) in mapCases)
+    {
+        var got = ForzaProcessDetection.MatchRunningGame(new[] { "explorer", proc, "svchost" });
+        if (got != expected) { mapOk = false; Console.WriteLine($"  map FAIL: {proc} -> '{got}' (expected '{expected}')"); }
+    }
+    Console.WriteLine($"  title map ({mapCases.Length} cases) -> {(mapOk ? "PASS" : "FAIL")}");
+    if (!mapOk) failures++;
+
+    // No Forza process among many -> null.
+    bool noneOk = ForzaProcessDetection.MatchRunningGame(new[] { "explorer", "steam", "discord" }) is null;
+    Console.WriteLine($"  no Forza process -> null: {(noneOk ? "PASS" : "FAIL")}");
+    if (!noneOk) failures++;
+
+    // Debounce: a change must hold for StablePolls consecutive polls before it fires; a single-tick
+    // blip is suppressed.
+    {
+        var d = new ForzaProcessDetection.Debouncer();
+        // Single-poll blip: detected for one poll then gone -> never reports a start.
+        bool fired1 = d.Step("Forza Horizon 5");   // poll 1: candidate, not yet stable
+        bool fired2 = d.Step(null);                 // poll 2: blip gone before confirming
+        bool blipSuppressed = !fired1 && !fired2 && d.Stable is null;
+        Console.WriteLine($"  single-poll blip suppressed: {(blipSuppressed ? "PASS" : "FAIL")}");
+        if (!blipSuppressed) failures++;
+    }
+    {
+        var d = new ForzaProcessDetection.Debouncer();
+        // Sustained detection: held for StablePolls polls -> reports start once, on the Nth poll.
+        bool a = d.Step("Forza Horizon 6"); // poll 1
+        bool b = d.Step("Forza Horizon 6"); // poll 2 -> reaches StablePolls (2)
+        bool startedOnce = !a && b && d.Stable == "Forza Horizon 6";
+        // Steady-state: same detection keeps reporting no further change.
+        bool steady = !d.Step("Forza Horizon 6");
+        // Sustained absence -> reports stop once.
+        bool c = d.Step(null);              // poll 1 of absence
+        bool e = d.Step(null);              // poll 2 -> stable idle
+        bool stoppedOnce = !c && e && d.Stable is null;
+        bool debounceOk = startedOnce && steady && stoppedOnce;
+        Console.WriteLine($"  sustained start/stop fire once each: {(debounceOk ? "PASS" : "FAIL")}");
+        if (!debounceOk) failures++;
+    }
+}
+
 Console.WriteLine();
 if (failures == 0)
 {

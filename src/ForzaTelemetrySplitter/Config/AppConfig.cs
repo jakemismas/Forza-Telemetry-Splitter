@@ -26,6 +26,13 @@ public sealed class AppConfig
     public bool AutoStartSplitting { get; set; } = true;
 
     /// <summary>
+    /// Start splitting automatically while a supported Forza game is running, and return to idle
+    /// when it closes. Distinct from <see cref="AutoStartSplitting"/>: that one starts at app
+    /// launch regardless of any game; this one tracks the game process (see ForzaProcessWatcher).
+    /// </summary>
+    public bool AutoSplitOnGameDetected { get; set; } = true;
+
+    /// <summary>
     /// True once the user has seen the first-run welcome window. Defaults false so the welcome
     /// (which walks through Forza's Data Out settings) shows on the very first launch only.
     /// </summary>
@@ -65,6 +72,7 @@ public sealed class AppConfig
         ListenPort = 44405,
         ShowOverlay = true,
         AutoStartSplitting = true,
+        AutoSplitOnGameDetected = true,
         Destinations = new List<Destination>
         {
             // Forwards to each tool's EXISTING default listen port — nothing to reconfigure.

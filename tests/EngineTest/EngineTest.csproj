@@ -11,6 +11,7 @@
   <!-- Compile the real engine sources directly so we test the exact production code. -->
   <ItemGroup>
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\ForzaPacket.cs" />
+    <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\ForzaProcessDetection.cs" />
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\Destination.cs" />
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\SplitterEngine.cs" />
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\SessionRecorder.cs" />

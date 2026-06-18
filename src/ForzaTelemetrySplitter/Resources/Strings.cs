@@ -32,6 +32,8 @@ public static class Strings
     public static string Tray_SetupGuide => Get(nameof(Tray_SetupGuide));
     public static string Tray_CheckUpdates => Get(nameof(Tray_CheckUpdates));
     public static string Tray_Exit => Get(nameof(Tray_Exit));
+    public static string Tray_GameDetected(string game) => Format(nameof(Tray_GameDetected), game);
+    public static string Tray_GameClosed => Get(nameof(Tray_GameClosed));
 
     // Main window
     public static string Main_Title => Get(nameof(Main_Title));
@@ -57,6 +59,8 @@ public static class Strings
     public static string Tab_Overlay => Get(nameof(Tab_Overlay));
     public static string Tab_Settings => Get(nameof(Tab_Settings));
     public static string Settings_StartupDesc => Get(nameof(Settings_StartupDesc));
+    public static string Settings_AutoSplit => Get(nameof(Settings_AutoSplit));
+    public static string Settings_AutoSplitDesc => Get(nameof(Settings_AutoSplitDesc));
     public static string Settings_UnitDesc => Get(nameof(Settings_UnitDesc));
     public static string Settings_LangDesc => Get(nameof(Settings_LangDesc));
 
@@ -100,6 +104,7 @@ public static class Strings
     // Status
     public static string Status_Stopped => Get(nameof(Status_Stopped));
     public static string Status_WaitingForForza(string ip, int port) => Format(nameof(Status_WaitingForForza), ip, port);
+    public static string Status_GameDetectedWaiting(string game) => Format(nameof(Status_GameDetectedWaiting), game);
     public static string Status_Connected(string game, int pps, string race, string readout)
         => Format(nameof(Status_Connected), game, pps, race, readout);
     public static string Status_RaceOn => Get(nameof(Status_RaceOn));

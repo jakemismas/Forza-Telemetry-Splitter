@@ -58,6 +58,8 @@
   <data name="Tray_SetupGuide" xml:space="preserve"><value>Setup guide…</value></data>
   <data name="Tray_CheckUpdates" xml:space="preserve"><value>Check for updates…</value></data>
   <data name="Tray_Exit" xml:space="preserve"><value>Exit</value></data>
+  <data name="Tray_GameDetected" xml:space="preserve"><value>{0} detected. Splitting telemetry automatically.</value></data>
+  <data name="Tray_GameClosed" xml:space="preserve"><value>Forza closed. Back to idle, still listening.</value></data>
 
   <data name="Main_Title" xml:space="preserve"><value>Forza Telemetry Splitter</value></data>
   <data name="Main_Add" xml:space="preserve"><value>Add</value></data>
@@ -80,6 +82,8 @@
   <data name="Tab_Overlay" xml:space="preserve"><value>Overlay</value></data>
   <data name="Tab_Settings" xml:space="preserve"><value>Settings</value></data>
   <data name="Settings_StartupDesc" xml:space="preserve"><value>Launch Forza Telemetry Splitter automatically when you sign in to Windows.</value></data>
+  <data name="Settings_AutoSplit" xml:space="preserve"><value>Start splitting automatically when a Forza game is running</value></data>
+  <data name="Settings_AutoSplitDesc" xml:space="preserve"><value>Detects Forza Horizon 4, 5, and 6 and Forza Motorsport, then starts splitting when the game launches and returns to idle when it closes.</value></data>
   <data name="Settings_UnitDesc" xml:space="preserve"><value>Units for the speed shown in the overlay and status line.</value></data>
   <data name="Settings_LangDesc" xml:space="preserve"><value>Display language for the app.</value></data>
   <data name="Main_BackgroundNote" xml:space="preserve"><value>You can close this window, the tool will remain open in the background.</value></data>
@@ -112,6 +116,7 @@
 
   <data name="Status_Stopped" xml:space="preserve"><value>Stopped — not receiving telemetry</value></data>
   <data name="Status_WaitingForForza" xml:space="preserve"><value>Running — waiting for Forza to send telemetry (set Data Out → {0}:{1})</value></data>
+  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} detected — waiting for telemetry (turn on Data Out in the game's HUD settings)</value></data>
   <data name="Status_Connected" xml:space="preserve"><value>Receiving from {0} — {1} pkts/s — Race {2} — {3}</value></data>
   <data name="Status_RaceOn" xml:space="preserve"><value>ON</value></data>
   <data name="Status_RaceOff" xml:space="preserve"><value>OFF</value></data>

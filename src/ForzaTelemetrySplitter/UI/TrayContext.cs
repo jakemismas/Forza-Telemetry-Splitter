@@ -45,6 +45,7 @@ public sealed class TrayContext : ApplicationContext
         _tray.DoubleClick += (_, _) => ShowMainWindow();
 
         _mainForm.RunStateChanged += RefreshRunState;
+        _mainForm.AutoSplitNotice += OnAutoSplitNotice;
         _mainForm.Engine.ErrorOccurred += OnEngineErrorBalloon;
         _mainForm.Engine.PortInUse += port => OnEngineErrorBalloon(Strings.Error_PortInUse(port));
 
@@ -132,6 +133,21 @@ public sealed class TrayContext : ApplicationContext
             _tray.BalloonTipTitle = "Forza Telemetry Splitter";
             _tray.BalloonTipText = message.Length > 200 ? message[..200] + "…" : message;
             _tray.ShowBalloonTip(5000);
+        }
+        catch { /* balloon is best-effort */ }
+    }
+
+    /// <summary>
+    /// The watcher auto-started (game != null, naming it) or auto-stopped (game == null) the splitter.
+    /// Surface a brief, friendly balloon so the user sees the zero-click lifecycle working.
+    /// </summary>
+    private void OnAutoSplitNotice(string? game)
+    {
+        try
+        {
+            _tray.BalloonTipTitle = "Forza Telemetry Splitter";
+            _tray.BalloonTipText = game is null ? Strings.Tray_GameClosed : Strings.Tray_GameDetected(game);
+            _tray.ShowBalloonTip(4000);
         }
         catch { /* balloon is best-effort */ }
     }
