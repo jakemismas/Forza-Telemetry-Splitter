@@ -15,6 +15,7 @@ public sealed class MainForm : Form
     private readonly SplitterEngine _engine;
 
     private readonly DataGridView _grid = new();
+    private readonly DataGridView _companionGrid = new();
     private readonly Button _startStop = new();
     private readonly Label _status = new();
     private readonly Label _listenInfo = new();
@@ -68,6 +69,13 @@ public sealed class MainForm : Form
     /// (string = null) the splitter, so the tray can show a balloon naming the game.
     /// </summary>
     public event Action<string?>? AutoSplitNotice;
+
+    /// <summary>
+    /// Raised when launching a companion app fails (e.g. the path was moved or deleted). Carries the
+    /// companion's display name and the error text. Non-fatal: the launch pass continues with the
+    /// remaining companions and the relay. The tray surfaces this as a balloon.
+    /// </summary>
+    public event Action<string, string>? CompanionLaunchFailed;
 
     [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public SplitterEngine Engine => _engine;
@@ -426,6 +434,136 @@ public sealed class MainForm : Form
         _language.SetBounds(x + 350, y, 130, 24);
         _language.SelectedIndexChanged += OnLanguageChanged;
         host.Controls.Add(_language);
+        y += 36 + gap;
+
+        BuildCompanionSection(host, x, y, gap);
+    }
+
+    /// <summary>
+    /// The "Companion apps" sub-section of the Settings tab: a heading + description, a grid that
+    /// mirrors the destination grid (inline Enabled toggle, double-click to edit), and Add/Edit/Remove
+    /// buttons. Anchored to fill the remaining tab height. Edits persist to config.json but never
+    /// launch anything — companions launch only on splitter start (see <see cref="LaunchEnabledCompanions"/>).
+    /// </summary>
+    private void BuildCompanionSection(Control host, int x, int y, int gap)
+    {
+        var heading = new Label
+        {
+            Text = Strings.Settings_Companions,
+            AutoSize = true,
+            Font = new Font("Segoe UI", 9.5f, FontStyle.Bold),
+        };
+        heading.SetBounds(x, y, 300, 20);
+        heading.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+        host.Controls.Add(heading);
+        y += 22;
+
+        var desc = MakeDesc(Strings.Settings_CompanionsDesc, x, y, host.ClientSize.Width - x - 18);
+        desc.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        host.Controls.Add(desc);
+        y = desc.Bottom + gap;
+
+        int H = host.ClientSize.Height;
+        int W = host.ClientSize.Width;
+        int btnRow = H - 40;
+
+        _companionGrid.SetBounds(x, y, W - x - 18, btnRow - y - gap);
+        _companionGrid.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        _companionGrid.AllowUserToAddRows = false;
+        _companionGrid.AllowUserToDeleteRows = false;
+        _companionGrid.RowHeadersVisible = false;
+        _companionGrid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+        _companionGrid.MultiSelect = false;
+        _companionGrid.ShowCellToolTips = true;
+        _companionGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        _companionGrid.EditMode = DataGridViewEditMode.EditProgrammatically;
+        _companionGrid.Columns.Add(new DataGridViewCheckBoxColumn { HeaderText = Strings.Col_On, Name = "Enabled", FillWeight = 10 });
+        _companionGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = Strings.Col_Name, Name = "Name", FillWeight = 26 });
+        _companionGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = Strings.Col_Path, Name = "Path", FillWeight = 44 });
+        _companionGrid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = Strings.Col_Args, Name = "Args", FillWeight = 20 });
+        _companionGrid.CellContentClick += OnCompanionGridCellClick;
+        _companionGrid.CellDoubleClick += (_, e) =>
+        {
+            if (e.RowIndex >= 0 && _companionGrid.Columns[e.ColumnIndex].Name != "Enabled")
+                EditCompanion();
+        };
+        host.Controls.Add(_companionGrid);
+
+        var add = MakeButton(host, Strings.Main_Add, x, btnRow, AnchorStyles.Bottom | AnchorStyles.Left);
+        add.Click += (_, _) => AddCompanion();
+        var edit = MakeButton(host, Strings.Main_Edit, x + 84, btnRow, AnchorStyles.Bottom | AnchorStyles.Left);
+        edit.Click += (_, _) => EditCompanion();
+        var remove = MakeButton(host, Strings.Main_Remove, x + 168, btnRow, AnchorStyles.Bottom | AnchorStyles.Left);
+        remove.Click += (_, _) => RemoveCompanion();
+
+        RefreshCompanionGrid();
+    }
+
+    private Companion? SelectedCompanion =>
+        _companionGrid.SelectedRows.Count > 0 ? _companionGrid.SelectedRows[0].Tag as Companion : null;
+
+    private void RefreshCompanionGrid()
+    {
+        _companionGrid.Rows.Clear();
+        foreach (var c in _config.Companions)
+        {
+            int idx = _companionGrid.Rows.Add();
+            var row = _companionGrid.Rows[idx];
+            row.Cells["Enabled"].Value = c.Enabled;
+            row.Cells["Name"].Value = c.Name;
+            row.Cells["Path"].Value = c.Path;
+            row.Cells["Args"].Value = c.Arguments;
+            row.Cells["Path"].ToolTipText = c.Path;
+            row.Tag = c;
+        }
+    }
+
+    private void OnCompanionGridCellClick(object? sender, DataGridViewCellEventArgs e)
+    {
+        if (e.RowIndex < 0) return;
+        // Toggle Enabled inline; persist, but never launch on a config change.
+        if (_companionGrid.Columns[e.ColumnIndex].Name == "Enabled" &&
+            _companionGrid.Rows[e.RowIndex].Tag is Companion c)
+        {
+            c.Enabled = !c.Enabled;
+            _companionGrid.Rows[e.RowIndex].Cells["Enabled"].Value = c.Enabled;
+            ConfigStore.Save(_config);
+        }
+    }
+
+    private void AddCompanion()
+    {
+        using var dlg = new CompanionDialog();
+        if (dlg.ShowDialog(this) != DialogResult.OK) return;
+        _config.Companions.Add(dlg.Result);
+        ConfigStore.Save(_config);
+        RefreshCompanionGrid();
+    }
+
+    private void EditCompanion()
+    {
+        var c = SelectedCompanion;
+        if (c is null) return;
+        using var dlg = new CompanionDialog(c);
+        if (dlg.ShowDialog(this) != DialogResult.OK) return;
+        c.Name = dlg.Result.Name;
+        c.Path = dlg.Result.Path;
+        c.Arguments = dlg.Result.Arguments;
+        c.Enabled = dlg.Result.Enabled;
+        ConfigStore.Save(_config);
+        RefreshCompanionGrid();
+    }
+
+    private void RemoveCompanion()
+    {
+        var c = SelectedCompanion;
+        if (c is null) return;
+        if (MessageBox.Show(this, Strings.Remove_Confirm(c.Name), Strings.Comp_RemoveTitle,
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            return;
+        _config.Companions.Remove(c);
+        ConfigStore.Save(_config);
+        RefreshCompanionGrid();
     }
 
     private static Label MakeDesc(string text, int x, int y, int width)
@@ -613,6 +751,41 @@ public sealed class MainForm : Form
         ConfigStore.Save(_config);
     }
 
+    /// <summary>
+    /// Launch each enabled companion that is not already running. Called only from the two
+    /// splitter-start paths (manual <see cref="ToggleRunning"/> and the watcher's
+    /// <see cref="OnGameDetected"/>) after the engine successfully starts — never on config save or
+    /// window focus. The already-running check reuses the watcher's admin-free process snapshot.
+    /// Each launch is best-effort: a missing or moved path raises <see cref="CompanionLaunchFailed"/>
+    /// and the pass continues, so one bad path never blocks the other companions or the relay.
+    /// </summary>
+    private void LaunchEnabledCompanions()
+    {
+        if (_config.Companions.Count == 0) return;
+
+        var running = ForzaProcessWatcher.SnapshotProcessNames();
+        foreach (var c in CompanionLauncher.SelectToLaunch(_config.Companions, running))
+        {
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = c.Path,
+                    Arguments = c.Arguments ?? "",
+                    UseShellExecute = true, // lets a .bat and shell-registered .exe launch normally
+                };
+                var dir = Path.GetDirectoryName(c.Path);
+                if (!string.IsNullOrEmpty(dir)) psi.WorkingDirectory = dir;
+                System.Diagnostics.Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                // Non-fatal: surface and keep going (the tray shows a balloon).
+                CompanionLaunchFailed?.Invoke(c.Name, ex.Message);
+            }
+        }
+    }
+
     public void ToggleRunning()
     {
         if (_engine.Running)
@@ -628,7 +801,8 @@ public sealed class MainForm : Form
             // A manual Start clears any prior manual-stop hold.
             _manualStopThisSession = false;
             _engine.SetDestinations(_config.Destinations);
-            _engine.Start(_config.ListenIp, _config.ListenPort);
+            if (_engine.Start(_config.ListenIp, _config.ListenPort))
+                LaunchEnabledCompanions();
         }
         UpdateStartStopButton();
         RunStateChanged?.Invoke();
@@ -645,6 +819,7 @@ public sealed class MainForm : Form
         if (_engine.Start(_config.ListenIp, _config.ListenPort))
         {
             _autoStarted = true;
+            LaunchEnabledCompanions();
             UpdateStartStopButton();
             RunStateChanged?.Invoke();
             AutoSplitNotice?.Invoke(game);

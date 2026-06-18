@@ -13,6 +13,8 @@
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\ForzaPacket.cs" />
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\ForzaProcessDetection.cs" />
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\Destination.cs" />
+    <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\Companion.cs" />
+    <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\CompanionLauncher.cs" />
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\SplitterEngine.cs" />
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\SessionRecorder.cs" />
     <Compile Include="..\..\src\ForzaTelemetrySplitter\Core\ActivityHistory.cs" />

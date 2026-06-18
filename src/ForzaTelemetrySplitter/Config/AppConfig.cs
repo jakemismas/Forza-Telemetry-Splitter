@@ -63,6 +63,12 @@ public sealed class AppConfig
     public List<Destination> Destinations { get; set; } = new();
 
     /// <summary>
+    /// Downstream tools to launch when the splitter starts (manual or auto). Each is a user-added
+    /// .exe or .bat; the app never auto-discovers tools and never stops them. See <see cref="Companion"/>.
+    /// </summary>
+    public List<Companion> Companions { get; set; } = new();
+
+    /// <summary>
     /// The configuration a brand-new user gets on first run: VirtualTCU enabled on 5556,
     /// plus a disabled placeholder they can rename to their tuner of choice.
     /// </summary>

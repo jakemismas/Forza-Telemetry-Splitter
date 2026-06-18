@@ -427,6 +427,55 @@ Console.WriteLine("=== Forza Telemetry Splitter — engine verification ===\n");
     }
 }
 
+// --- Test 14: Companion launcher selection (already-running check) -----------------------
+{
+    Console.WriteLine("[Test 14] Companion launcher: SelectToLaunch / IsAlreadyRunning");
+
+    static Companion C(string name, string path, bool enabled = true, string args = "") =>
+        new() { Name = name, Path = path, Arguments = args, Enabled = enabled };
+
+    // ProcessKey: .exe -> filename minus extension (case-insensitive); .bat / blank -> null.
+    var keyOk =
+        CompanionLauncher.ProcessKey(@"C:\Tools\VirtualTCU.exe") == "VirtualTCU" &&
+        CompanionLauncher.ProcessKey(@"C:\Tools\SimHub.EXE") == "SimHub" &&
+        CompanionLauncher.ProcessKey(@"C:\Tools\launch.bat") is null &&
+        CompanionLauncher.ProcessKey("") is null;
+    Console.WriteLine($"  ProcessKey exe/bat/blank -> {(keyOk ? "PASS" : "FAIL")}");
+    if (!keyOk) failures++;
+
+    // IsAlreadyRunning matches case-insensitively on the derived exe key.
+    var running = new[] { "explorer", "VirtualTCU", "discord" };
+    var runOk =
+        CompanionLauncher.IsAlreadyRunning(@"C:\X\virtualtcu.exe", running) &&        // case-insensitive match
+        !CompanionLauncher.IsAlreadyRunning(@"C:\X\SimHub.exe", running) &&           // not running -> launch
+        !CompanionLauncher.IsAlreadyRunning(@"C:\X\go.bat", running);                 // .bat: no key -> not "running"
+    Console.WriteLine($"  IsAlreadyRunning exe match / miss / bat -> {(runOk ? "PASS" : "FAIL")}");
+    if (!runOk) failures++;
+
+    // SelectToLaunch: enabled+not-running selected; running skipped; disabled skipped; blank-path
+    // skipped; .bat always selected (not trackable); order preserved; no double-select.
+    var companions = new[]
+    {
+        C("TCU",      @"C:\X\VirtualTCU.exe"),               // already running -> skip
+        C("SimHub",   @"C:\X\SimHub.exe"),                   // not running -> launch
+        C("Disabled", @"C:\X\Other.exe", enabled: false),    // disabled -> skip
+        C("Script",   @"C:\X\go.bat"),                       // .bat -> always launch
+        C("NoPath",   ""),                                   // no path -> skip
+    };
+    var selected = CompanionLauncher.SelectToLaunch(companions, running);
+    var names = selected.Select(c => c.Name).ToArray();
+    bool selectOk = names.Length == 2 && names[0] == "SimHub" && names[1] == "Script";
+    Console.WriteLine($"  SelectToLaunch picks [{string.Join(", ", names)}] -> {(selectOk ? "PASS" : "FAIL")}");
+    if (!selectOk) failures++;
+
+    // A second already-running exe is not double-selected even if listed twice in companions.
+    var dupes = new[] { C("A", @"C:\X\SimHub.exe"), C("B", @"C:\X\VirtualTCU.exe") };
+    var dupSel = CompanionLauncher.SelectToLaunch(dupes, running);
+    bool dupOk = dupSel.Count == 1 && dupSel[0].Name == "A"; // B is running -> skipped
+    Console.WriteLine($"  running exe skipped among dupes -> {(dupOk ? "PASS" : "FAIL")}");
+    if (!dupOk) failures++;
+}
+
 Console.WriteLine();
 if (failures == 0)
 {

@@ -38,7 +38,7 @@ public sealed class ForzaProcessWatcher : IDisposable
         string? detected;
         try
         {
-            detected = ForzaProcessDetection.MatchRunningGame(EnumerateProcessNames());
+            detected = ForzaProcessDetection.MatchRunningGame(SnapshotProcessNames());
         }
         catch
         {
@@ -56,10 +56,12 @@ public sealed class ForzaProcessWatcher : IDisposable
     }
 
     /// <summary>
-    /// Snapshot of current process names. Each <see cref="Process.ProcessName"/> read is guarded because
-    /// a process can exit between the enumeration and the property read.
+    /// Snapshot of current process names, enumerating only the current user's session (no admin
+    /// rights). Each <see cref="Process.ProcessName"/> read is guarded because a process can exit
+    /// between the enumeration and the property read. Shared with the companion launcher's
+    /// already-running check so both paths use the exact same admin-free enumeration.
     /// </summary>
-    private static IEnumerable<string> EnumerateProcessNames()
+    public static IEnumerable<string> SnapshotProcessNames()
     {
         var procs = Process.GetProcesses();
         try

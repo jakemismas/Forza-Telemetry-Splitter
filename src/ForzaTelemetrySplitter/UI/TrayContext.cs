@@ -46,6 +46,8 @@ public sealed class TrayContext : ApplicationContext
 
         _mainForm.RunStateChanged += RefreshRunState;
         _mainForm.AutoSplitNotice += OnAutoSplitNotice;
+        _mainForm.CompanionLaunchFailed += (name, error) =>
+            OnEngineErrorBalloon(Strings.Error_CompanionLaunch(name, error));
         _mainForm.Engine.ErrorOccurred += OnEngineErrorBalloon;
         _mainForm.Engine.PortInUse += port => OnEngineErrorBalloon(Strings.Error_PortInUse(port));
 

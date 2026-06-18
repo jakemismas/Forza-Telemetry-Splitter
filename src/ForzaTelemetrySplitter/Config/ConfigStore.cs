@@ -52,8 +52,13 @@ public static class ConfigStore
     private static void Sanitize(AppConfig cfg)
     {
         cfg.ListenPort = Math.Clamp(cfg.ListenPort, 1, 65535);
+        cfg.Destinations ??= new();
         foreach (var d in cfg.Destinations)
             d.Port = Math.Clamp(d.Port, 1, 65535);
+
+        // An explicit "Companions": null in a hand-edited config would otherwise crash the launch
+        // pass; normalize it to an empty list.
+        cfg.Companions ??= new();
     }
 
     public static void Save(AppConfig config)

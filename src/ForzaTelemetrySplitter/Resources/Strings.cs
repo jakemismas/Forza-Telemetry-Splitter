@@ -147,6 +147,26 @@ public static class Strings
     public static string Lang_Auto => Get(nameof(Lang_Auto));
     public static string Lang_RestartNote => Get(nameof(Lang_RestartNote));
 
+    // Companion apps (Settings tab + dialog)
+    public static string Settings_Companions => Get(nameof(Settings_Companions));
+    public static string Settings_CompanionsDesc => Get(nameof(Settings_CompanionsDesc));
+    public static string Comp_AddTitle => Get(nameof(Comp_AddTitle));
+    public static string Comp_EditTitle => Get(nameof(Comp_EditTitle));
+    public static string Comp_Name => Get(nameof(Comp_Name));
+    public static string Comp_Path => Get(nameof(Comp_Path));
+    public static string Comp_Browse => Get(nameof(Comp_Browse));
+    public static string Comp_Arguments => Get(nameof(Comp_Arguments));
+    public static string Comp_Enabled => Get(nameof(Comp_Enabled));
+    public static string Comp_BatNote => Get(nameof(Comp_BatNote));
+    public static string Comp_MissingName => Get(nameof(Comp_MissingName));
+    public static string Comp_MissingPath => Get(nameof(Comp_MissingPath));
+    public static string Comp_FileFilter => Get(nameof(Comp_FileFilter));
+    public static string Comp_RemoveTitle => Get(nameof(Comp_RemoveTitle));
+    public static string Col_Path => Get(nameof(Col_Path));
+    public static string Col_Args => Get(nameof(Col_Args));
+
     // Errors
     public static string Error_PortInUse(int port) => Format(nameof(Error_PortInUse), port);
+    public static string Error_CompanionLaunch(string name, string error)
+        => Format(nameof(Error_CompanionLaunch), name, error);
 }

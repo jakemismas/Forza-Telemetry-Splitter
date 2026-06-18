@@ -158,4 +158,26 @@
 Forza Telemetry Splitter needs its own free port to receive from Forza. Another tool (or a second copy of the splitter) is holding this one.
 
 Fix: open the splitter and change its listen port to a free one, then set Forza's Data Out port to match. The default {0} is normally free.</value></data>
+
+  <data name="Settings_Companions" xml:space="preserve"><value>Companion apps</value></data>
+  <data name="Settings_CompanionsDesc" xml:space="preserve"><value>Tools to launch when the splitter starts (manual or auto). Each enabled app starts unless it's already running. The splitter starts them but never closes them.</value></data>
+  <data name="Comp_AddTitle" xml:space="preserve"><value>Add companion app</value></data>
+  <data name="Comp_EditTitle" xml:space="preserve"><value>Edit companion app</value></data>
+  <data name="Comp_Name" xml:space="preserve"><value>Name:</value></data>
+  <data name="Comp_Path" xml:space="preserve"><value>Program:</value></data>
+  <data name="Comp_Browse" xml:space="preserve"><value>Browse...</value></data>
+  <data name="Comp_Arguments" xml:space="preserve"><value>Arguments:</value></data>
+  <data name="Comp_Enabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="Comp_BatNote" xml:space="preserve"><value>Batch files can't be checked for duplicates and may relaunch each time the splitter starts.</value></data>
+  <data name="Comp_MissingName" xml:space="preserve"><value>Please enter a name.</value></data>
+  <data name="Comp_MissingPath" xml:space="preserve"><value>Please choose a program to launch (an .exe or .bat).</value></data>
+  <data name="Comp_FileFilter" xml:space="preserve"><value>Programs and scripts (*.exe;*.bat)|*.exe;*.bat|All files (*.*)|*.*</value></data>
+  <data name="Comp_RemoveTitle" xml:space="preserve"><value>Remove companion app</value></data>
+  <data name="Col_Path" xml:space="preserve"><value>Program</value></data>
+  <data name="Col_Args" xml:space="preserve"><value>Arguments</value></data>
+  <data name="Error_CompanionLaunch" xml:space="preserve"><value>Couldn't launch companion app "{0}".
+
+{1}
+
+Check the path in Settings &gt; Companion apps. The splitter and your other tools are unaffected.</value></data>
 </root>
