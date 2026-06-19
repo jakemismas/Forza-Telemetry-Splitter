@@ -41,10 +41,14 @@ public sealed class SplitterEngine
     // Session recorder (Part C). Null unless recording is active.
     private SessionRecorder? _recorder;
 
-    // Rolling 1 Hz packets/sec history for the Activity graph. Sampled inline on the rx thread when a
-    // 1-second window rolls over (see UpdateStatus) — no separate timer, so it adds zero jitter to
-    // forwarding. Idle/stopped seconds don't advance, which the chart renders as a gap.
+    // Rolling 1 Hz packets/sec history for the Activity graph. Sampled by a dedicated ~1 Hz timer
+    // (see OnSampleTick), NOT by packet arrival, so a second with no packets still emits one
+    // float.NaN "no data" sample. That is what lets the chart break the line into a gap the moment
+    // the game closes, instead of holding the last value. The timer runs entirely off the forward
+    // path (the rx thread only bumps a counter), so it adds no jitter to forwarding.
     private readonly ActivityHistory _history = new();
+    private System.Threading.Timer? _sampleTimer;
+    private const int SampleIntervalMs = 1000;
 
     /// <summary>Rolling last-hour packets/sec history (in memory only; never persisted).</summary>
     public ActivityHistory History => _history;
@@ -62,9 +66,8 @@ public sealed class SplitterEngine
     private int _lastGear;                  // latest parsed gear
     private float _lastSpeedMps;            // latest parsed speed (m/s)
     private volatile ForzaFormat _lastFormat = ForzaFormat.Unknown; // latest detected game/format
-    private int _packetsThisSecond;         // accumulator
-    private int _packetsPerSecond;          // last completed 1s window
-    private long _windowStartTicks;
+    private int _packetsThisSecond;         // accumulator (Interlocked: rx thread adds, sample tick reads+clears)
+    private int _packetsPerSecond;          // last completed 1s window (written by the sample tick)
 
     /// <summary>Raised when binding fails or the socket dies unexpectedly (already-formatted text).</summary>
     public event Action<string>? ErrorOccurred;
@@ -106,7 +109,7 @@ public sealed class SplitterEngine
             {
                 (_socket, _sendSocket) = CreateBoundSockets(listenIp, listenPort);
                 _running = true;
-                _windowStartTicks = Stopwatch.GetTimestamp();
+                Interlocked.Exchange(ref _packetsThisSecond, 0);
 
                 _rxThread = new Thread(ReceiveLoop)
                 {
@@ -115,6 +118,10 @@ public sealed class SplitterEngine
                     Priority = ThreadPriority.AboveNormal,
                 };
                 _rxThread.Start();
+
+                // Steady ~1 Hz sampler. Each tick records the past second's pkt count, or NaN when no
+                // packets arrived, so idle and game-closed seconds become gaps on the chart.
+                _sampleTimer = new System.Threading.Timer(OnSampleTick, null, SampleIntervalMs, SampleIntervalMs);
                 return true;
             }
             catch (SocketException ex) when (
@@ -172,6 +179,7 @@ public sealed class SplitterEngine
         Thread? rx;
         Socket? sock;
         Socket? send;
+        System.Threading.Timer? timer;
         lock (_gate)
         {
             if (!_running) return;
@@ -182,17 +190,22 @@ public sealed class SplitterEngine
             _sendSocket = null;
             rx = _rxThread;
             _rxThread = null;
+            timer = _sampleTimer;
+            _sampleTimer = null;
         }
 
         // Closing the socket unblocks the blocking Receive() in the loop.
         try { sock?.Close(); } catch { /* ignore */ }
         try { send?.Close(); } catch { /* ignore */ }
         try { rx?.Join(500); } catch { /* ignore */ }
+        // Dispose the sampler. _running is already false, so OnSampleTick is a no-op even if one
+        // callback is already in flight; disposal stops any future ticks.
+        try { timer?.Dispose(); } catch { /* ignore */ }
 
         StopRecording(); // close any open capture file
 
         _packetsPerSecond = 0;
-        _packetsThisSecond = 0;
+        Interlocked.Exchange(ref _packetsThisSecond, 0);
     }
 
     /// <summary>True while a session is being captured to disk.</summary>
@@ -371,18 +384,24 @@ public sealed class SplitterEngine
         _lastSpeedMps = ForzaPacket.SpeedMetersPerSecond(packet, format);
         Volatile.Write(ref _lastPacketTicks, Stopwatch.GetTimestamp());
 
-        _packetsThisSecond++;
-        long now = Stopwatch.GetTimestamp();
-        if (now - _windowStartTicks >= Stopwatch.Frequency)
-        {
-            _packetsPerSecond = _packetsThisSecond;
-            _packetsThisSecond = 0;
-            _windowStartTicks = now;
-            // Sample activity inline on the rx thread (off the forward path, which already happened).
-            // No extra timer thread = no added jitter to forwarding. Idle/stopped seconds simply don't
-            // advance the history, which the chart renders as a gap rather than a fake zero.
-            _history.Add(_packetsPerSecond);
-        }
+        // Hot path: just count. The 1 Hz OnSampleTick reads and clears this and writes the history,
+        // so forwarding never waits on a lock or a history write.
+        Interlocked.Increment(ref _packetsThisSecond);
+    }
+
+    /// <summary>
+    /// Runs ~once per second on a timer thread, independent of packet arrival. Records the past
+    /// second's packet count as the latest pkts/s, and appends it to the activity history — or
+    /// float.NaN when no packets arrived, so idle and game-closed seconds render as gaps rather than
+    /// a held flat line. A no-op once the engine has stopped, so a final queued callback can never
+    /// write a stray sample after teardown.
+    /// </summary>
+    private void OnSampleTick(object? state)
+    {
+        if (!_running) return;
+        int count = Interlocked.Exchange(ref _packetsThisSecond, 0);
+        _packetsPerSecond = count;
+        _history.Add(count > 0 ? count : float.NaN);
     }
 
     /// <summary>

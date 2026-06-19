@@ -476,6 +476,41 @@ Console.WriteLine("=== Forza Telemetry Splitter — engine verification ===\n");
     if (!dupOk) failures++;
 }
 
+// --- Test 15: idle seconds emit NaN gaps after packets stop (bug #5) ---------------------
+// When the game closes, packets stop arriving. The engine must keep emitting one history
+// sample per second on a steady cadence, writing float.NaN for each packet-free second, so the
+// chart breaks into a gap instead of holding the last value. Send a stream, then go quiet while
+// the engine keeps running, and confirm a real (>0) sample is followed by a NaN sample.
+{
+    Console.WriteLine("\n[Test 15] Idle seconds emit NaN gaps after packets stop (bug #5)");
+    var engine = new SplitterEngine();
+    engine.Start(ip, 34778);
+    using (var sender = new UdpClient())
+    {
+        var target = new IPEndPoint(IPAddress.Parse(ip), 34778);
+        // ~2.2s of steady traffic so at least two 1Hz ticks record a real count.
+        for (int i = 0; i < 140; i++) { sender.Send(new byte[324], 324, target); Thread.Sleep(16); }
+    }
+    // Stay running but quiet for ~2.5s so at least two ticks fire with no packets -> NaN.
+    Thread.Sleep(2500);
+
+    var dst = new float[engine.History.Capacity];
+    int count = engine.History.Snapshot(dst);
+    engine.Stop();
+
+    // Find the last real (>0) sample, then confirm a NaN gap appears after it (the idle phase).
+    int lastReal = -1;
+    for (int i = 0; i < count; i++)
+        if (!float.IsNaN(dst[i]) && dst[i] > 0) lastReal = i;
+    bool nanAfterActivity = false;
+    for (int i = lastReal + 1; i < count; i++)
+        if (float.IsNaN(dst[i])) { nanAfterActivity = true; break; }
+
+    bool ok = lastReal >= 0 && nanAfterActivity;
+    Console.WriteLine($"  samples={count}, lastRealIdx={lastReal}, NaN-after-activity={nanAfterActivity} -> {(ok ? "PASS" : "FAIL")}");
+    if (!ok) failures++;
+}
+
 Console.WriteLine();
 if (failures == 0)
 {
