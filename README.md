@@ -109,6 +109,7 @@ so you don't change the tool.
 |------|------------------|-------|
 | [VirtualTCU](https://github.com/Forza-Love/fh6-virtual_tcu) | 5555 | Auto-shifting. Unchanged — keep 5555. |
 | [ForzaDash](https://github.com/himanshupapola/ForzaDash) | 1234 | Open-source FH6 telemetry dashboard. |
+| [HorizonTuner](https://github.com/eddie772tw/FH6-HorizonTuner) | 8000 | Open-source FH6 telemetry analyzer, tuning workbench and HUD. |
 | [Forza-data-tools](https://github.com/richstokes/Forza-data-tools) | 9999 | Open-source CLI and browser dashboard. |
 | [SIM Dashboard](https://www.stryder-it.de/simdashboard/) | 5685 | Phone or tablet dashboard. Use the device's IP. |
 | [SimHub](https://www.simhubdash.com/) | 20777 | Dashboard and effects suite. |

@@ -22,6 +22,8 @@ public static class TunerPresets
             "Auto-shifting transmission controller. Keep its normal listen port 5555 — no change needed."),
         new TunerPreset("ForzaDash", 1234,
             "Open-source FH6 telemetry dashboard. Listens on 1234 by default."),
+        new TunerPreset("HorizonTuner", 8000,
+            "Open-source FH6 telemetry analyzer, tuning workbench and HUD. Listens on 8000 by default."),
         new TunerPreset("Forza-data-tools", 9999,
             "Open-source CLI/dashboard for Data Out. Listens on 9999 by default."),
         new TunerPreset("SIM Dashboard", 5685,
