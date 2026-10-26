@@ -112,7 +112,7 @@
 
   <data name="Status_Stopped" xml:space="preserve"><value>Gestoppt — keine Telemetrie empfangen</value></data>
   <data name="Status_WaitingForForza" xml:space="preserve"><value>Läuft — warte auf Telemetrie von Forza (Data Out auf {0}:{1} einstellen)</value></data>
-  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} erkannt — warte auf Telemetrie (Data Out in den HUD-Einstellungen des Spiels aktivieren)</value></data>
+  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} erkannt: warte auf Telemetrie (Data Out in den HUD-Einstellungen des Spiels aktivieren)</value></data>
   <data name="Status_Connected" xml:space="preserve"><value>Empfang von {0} — {1} Pakete/s — Rennen {2} — {3}</value></data>
   <data name="Status_RaceOn" xml:space="preserve"><value>AN</value></data>
   <data name="Status_RaceOff" xml:space="preserve"><value>AUS</value></data>

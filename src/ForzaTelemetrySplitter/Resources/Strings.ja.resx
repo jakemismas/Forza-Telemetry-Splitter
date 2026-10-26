@@ -112,7 +112,7 @@
 
   <data name="Status_Stopped" xml:space="preserve"><value>停止中 — テレメトリ未受信</value></data>
   <data name="Status_WaitingForForza" xml:space="preserve"><value>実行中 — Forza のテレメトリ送信を待機中（Data Out を {0}:{1} に設定）</value></data>
-  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} を検出 — テレメトリを待機中（ゲームの HUD 設定で Data Out を有効化）</value></data>
+  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} を検出：テレメトリを待機中（ゲームの HUD 設定で Data Out を有効化）</value></data>
   <data name="Status_Connected" xml:space="preserve"><value>{0} から受信中 — {1} パケット/秒 — レース {2} — {3}</value></data>
   <data name="Status_RaceOn" xml:space="preserve"><value>オン</value></data>
   <data name="Status_RaceOff" xml:space="preserve"><value>オフ</value></data>

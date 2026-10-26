@@ -112,7 +112,7 @@
 
   <data name="Status_Stopped" xml:space="preserve"><value>Detenido — sin recibir telemetría</value></data>
   <data name="Status_WaitingForForza" xml:space="preserve"><value>En ejecución — esperando la telemetría de Forza (configura Data Out en {0}:{1})</value></data>
-  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} detectado — esperando la telemetría (activa Data Out en los ajustes de HUD del juego)</value></data>
+  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} detectado: esperando la telemetría (activa Data Out en los ajustes de HUD del juego)</value></data>
   <data name="Status_Connected" xml:space="preserve"><value>Recibiendo de {0} — {1} paquetes/s — Carrera {2} — {3}</value></data>
   <data name="Status_RaceOn" xml:space="preserve"><value>SÍ</value></data>
   <data name="Status_RaceOff" xml:space="preserve"><value>NO</value></data>
