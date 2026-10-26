@@ -54,6 +54,8 @@
   <data name="Tray_SetupGuide" xml:space="preserve"><value>Guía de configuración…</value></data>
   <data name="Tray_CheckUpdates" xml:space="preserve"><value>Buscar actualizaciones…</value></data>
   <data name="Tray_Exit" xml:space="preserve"><value>Salir</value></data>
+  <data name="Tray_GameDetected" xml:space="preserve"><value>{0} detectado. Distribuyendo la telemetría automáticamente.</value></data>
+  <data name="Tray_GameClosed" xml:space="preserve"><value>Forza se ha cerrado. Vuelta a inactivo, sigue esperando.</value></data>
 
   <data name="Main_Title" xml:space="preserve"><value>Forza Telemetry Splitter</value></data>
   <data name="Main_Add" xml:space="preserve"><value>Agregar</value></data>
@@ -76,6 +78,8 @@
   <data name="Tab_Overlay" xml:space="preserve"><value>Superposición</value></data>
   <data name="Tab_Settings" xml:space="preserve"><value>Ajustes</value></data>
   <data name="Settings_StartupDesc" xml:space="preserve"><value>Iniciar Forza Telemetry Splitter automáticamente al iniciar sesión en Windows.</value></data>
+  <data name="Settings_AutoSplit" xml:space="preserve"><value>Iniciar la distribución automáticamente al ejecutarse un juego de Forza</value></data>
+  <data name="Settings_AutoSplitDesc" xml:space="preserve"><value>Detecta Forza Horizon 4, 5 y 6, así como Forza Motorsport; inicia la distribución al abrir el juego y vuelve a inactivo al cerrarlo.</value></data>
   <data name="Settings_UnitDesc" xml:space="preserve"><value>Unidades de la velocidad mostrada en la superposición y la barra de estado.</value></data>
   <data name="Settings_LangDesc" xml:space="preserve"><value>Idioma de la aplicación.</value></data>
   <data name="Main_BackgroundNote" xml:space="preserve"><value>Puedes cerrar esta ventana, la herramienta seguirá abierta en segundo plano.</value></data>
@@ -108,6 +112,7 @@
 
   <data name="Status_Stopped" xml:space="preserve"><value>Detenido — sin recibir telemetría</value></data>
   <data name="Status_WaitingForForza" xml:space="preserve"><value>En ejecución — esperando la telemetría de Forza (configura Data Out en {0}:{1})</value></data>
+  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} detectado — esperando la telemetría (activa Data Out en los ajustes de HUD del juego)</value></data>
   <data name="Status_Connected" xml:space="preserve"><value>Recibiendo de {0} — {1} paquetes/s — Carrera {2} — {3}</value></data>
   <data name="Status_RaceOn" xml:space="preserve"><value>SÍ</value></data>
   <data name="Status_RaceOff" xml:space="preserve"><value>NO</value></data>
@@ -149,4 +154,26 @@
 Forza Telemetry Splitter necesita su propio puerto libre para recibir de Forza. Otra herramienta (o una segunda copia del distribuidor) está ocupando este puerto.
 
 Solución: abre el distribuidor y cambia su puerto de escucha a uno libre, luego configura el puerto Data Out de Forza con el mismo valor. El puerto predeterminado {0} normalmente está libre.</value></data>
+
+  <data name="Settings_Companions" xml:space="preserve"><value>Apps complementarias</value></data>
+  <data name="Settings_CompanionsDesc" xml:space="preserve"><value>Herramientas que se inician cuando arranca el distribuidor (manual o automático). Cada app activada se inicia si no está ya en ejecución. El distribuidor las inicia, pero nunca las cierra.</value></data>
+  <data name="Comp_AddTitle" xml:space="preserve"><value>Agregar app complementaria</value></data>
+  <data name="Comp_EditTitle" xml:space="preserve"><value>Editar app complementaria</value></data>
+  <data name="Comp_Name" xml:space="preserve"><value>Nombre:</value></data>
+  <data name="Comp_Path" xml:space="preserve"><value>Programa:</value></data>
+  <data name="Comp_Browse" xml:space="preserve"><value>Examinar...</value></data>
+  <data name="Comp_Arguments" xml:space="preserve"><value>Argumentos:</value></data>
+  <data name="Comp_Enabled" xml:space="preserve"><value>Activado</value></data>
+  <data name="Comp_BatNote" xml:space="preserve"><value>No es posible comprobar duplicados en los archivos por lotes, por lo que podrían volver a lanzarse cada vez que se inicie el distribuidor.</value></data>
+  <data name="Comp_MissingName" xml:space="preserve"><value>Introduce un nombre.</value></data>
+  <data name="Comp_MissingPath" xml:space="preserve"><value>Elige un programa para iniciar (un archivo .exe o .bat).</value></data>
+  <data name="Comp_FileFilter" xml:space="preserve"><value>Programas y scripts (*.exe;*.bat)|*.exe;*.bat|Todos los archivos (*.*)|*.*</value></data>
+  <data name="Comp_RemoveTitle" xml:space="preserve"><value>Eliminar app complementaria</value></data>
+  <data name="Col_Path" xml:space="preserve"><value>Programa</value></data>
+  <data name="Col_Args" xml:space="preserve"><value>Argumentos</value></data>
+  <data name="Error_CompanionLaunch" xml:space="preserve"><value>No se pudo iniciar la app complementaria «{0}».
+
+{1}
+
+Comprueba la ruta en Ajustes &gt; Apps complementarias. El distribuidor y tus otras herramientas no se ven afectados.</value></data>
 </root>

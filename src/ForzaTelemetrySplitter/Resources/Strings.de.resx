@@ -54,6 +54,8 @@
   <data name="Tray_SetupGuide" xml:space="preserve"><value>Einrichtungsanleitung…</value></data>
   <data name="Tray_CheckUpdates" xml:space="preserve"><value>Nach Updates suchen…</value></data>
   <data name="Tray_Exit" xml:space="preserve"><value>Beenden</value></data>
+  <data name="Tray_GameDetected" xml:space="preserve"><value>{0} erkannt. Telemetrie wird automatisch verteilt.</value></data>
+  <data name="Tray_GameClosed" xml:space="preserve"><value>Forza beendet. Zurück im Leerlauf, wartet weiter.</value></data>
 
   <data name="Main_Title" xml:space="preserve"><value>Forza Telemetry Splitter</value></data>
   <data name="Main_Add" xml:space="preserve"><value>Hinzufügen</value></data>
@@ -76,6 +78,8 @@
   <data name="Tab_Overlay" xml:space="preserve"><value>Overlay</value></data>
   <data name="Tab_Settings" xml:space="preserve"><value>Einstellungen</value></data>
   <data name="Settings_StartupDesc" xml:space="preserve"><value>Forza Telemetry Splitter automatisch starten, wenn du dich bei Windows anmeldest.</value></data>
+  <data name="Settings_AutoSplit" xml:space="preserve"><value>Verteilung automatisch starten, wenn ein Forza-Spiel läuft</value></data>
+  <data name="Settings_AutoSplitDesc" xml:space="preserve"><value>Erkennt Forza Horizon 4, 5 und 6 sowie Forza Motorsport, startet die Verteilung beim Start des Spiels und wechselt beim Beenden zurück in den Leerlauf.</value></data>
   <data name="Settings_UnitDesc" xml:space="preserve"><value>Einheit für die im Overlay und der Statuszeile angezeigte Geschwindigkeit.</value></data>
   <data name="Settings_LangDesc" xml:space="preserve"><value>Anzeigesprache der App.</value></data>
   <data name="Main_BackgroundNote" xml:space="preserve"><value>Du kannst dieses Fenster schließen – das Tool läuft im Hintergrund weiter.</value></data>
@@ -108,6 +112,7 @@
 
   <data name="Status_Stopped" xml:space="preserve"><value>Gestoppt — keine Telemetrie empfangen</value></data>
   <data name="Status_WaitingForForza" xml:space="preserve"><value>Läuft — warte auf Telemetrie von Forza (Data Out auf {0}:{1} einstellen)</value></data>
+  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} erkannt — warte auf Telemetrie (Data Out in den HUD-Einstellungen des Spiels aktivieren)</value></data>
   <data name="Status_Connected" xml:space="preserve"><value>Empfang von {0} — {1} Pakete/s — Rennen {2} — {3}</value></data>
   <data name="Status_RaceOn" xml:space="preserve"><value>AN</value></data>
   <data name="Status_RaceOff" xml:space="preserve"><value>AUS</value></data>
@@ -149,4 +154,26 @@
 Forza Telemetry Splitter benötigt einen eigenen freien Port, um von Forza zu empfangen. Ein anderes Tool (oder eine zweite Kopie des Splitters) belegt diesen Port.
 
 Lösung: Öffne den Splitter und ändere seinen Empfangsport auf einen freien Port, und stelle dann den Data-Out-Port von Forza auf denselben Wert ein. Der Standardport {0} ist normalerweise frei.</value></data>
+
+  <data name="Settings_Companions" xml:space="preserve"><value>Begleit-Apps</value></data>
+  <data name="Settings_CompanionsDesc" xml:space="preserve"><value>Tools, die beim Start des Splitters gestartet werden (manuell oder automatisch). Jede aktivierte App wird gestartet, sofern sie nicht schon läuft. Der Splitter startet sie, schließt sie aber nie.</value></data>
+  <data name="Comp_AddTitle" xml:space="preserve"><value>Begleit-App hinzufügen</value></data>
+  <data name="Comp_EditTitle" xml:space="preserve"><value>Begleit-App bearbeiten</value></data>
+  <data name="Comp_Name" xml:space="preserve"><value>Name:</value></data>
+  <data name="Comp_Path" xml:space="preserve"><value>Programm:</value></data>
+  <data name="Comp_Browse" xml:space="preserve"><value>Durchsuchen...</value></data>
+  <data name="Comp_Arguments" xml:space="preserve"><value>Argumente:</value></data>
+  <data name="Comp_Enabled" xml:space="preserve"><value>Aktiviert</value></data>
+  <data name="Comp_BatNote" xml:space="preserve"><value>Batchdateien können nicht auf Duplikate geprüft werden und werden möglicherweise bei jedem Start des Splitters erneut gestartet.</value></data>
+  <data name="Comp_MissingName" xml:space="preserve"><value>Bitte einen Namen eingeben.</value></data>
+  <data name="Comp_MissingPath" xml:space="preserve"><value>Bitte ein Programm zum Starten auswählen (eine .exe- oder .bat-Datei).</value></data>
+  <data name="Comp_FileFilter" xml:space="preserve"><value>Programme und Skripte (*.exe;*.bat)|*.exe;*.bat|Alle Dateien (*.*)|*.*</value></data>
+  <data name="Comp_RemoveTitle" xml:space="preserve"><value>Begleit-App entfernen</value></data>
+  <data name="Col_Path" xml:space="preserve"><value>Programm</value></data>
+  <data name="Col_Args" xml:space="preserve"><value>Argumente</value></data>
+  <data name="Error_CompanionLaunch" xml:space="preserve"><value>Die Begleit-App „{0}“ konnte nicht gestartet werden.
+
+{1}
+
+Überprüfe den Pfad unter Einstellungen &gt; Begleit-Apps. Der Splitter und deine anderen Tools sind davon nicht betroffen.</value></data>
 </root>

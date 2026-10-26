@@ -54,6 +54,8 @@
   <data name="Tray_SetupGuide" xml:space="preserve"><value>Guide de configuration…</value></data>
   <data name="Tray_CheckUpdates" xml:space="preserve"><value>Rechercher des mises à jour…</value></data>
   <data name="Tray_Exit" xml:space="preserve"><value>Quitter</value></data>
+  <data name="Tray_GameDetected" xml:space="preserve"><value>{0} détecté. Répartition automatique de la télémétrie.</value></data>
+  <data name="Tray_GameClosed" xml:space="preserve"><value>Forza fermé. Retour à l'inactivité, toujours en attente.</value></data>
 
   <data name="Main_Title" xml:space="preserve"><value>Forza Telemetry Splitter</value></data>
   <data name="Main_Add" xml:space="preserve"><value>Ajouter</value></data>
@@ -76,6 +78,8 @@
   <data name="Tab_Overlay" xml:space="preserve"><value>Overlay</value></data>
   <data name="Tab_Settings" xml:space="preserve"><value>Paramètres</value></data>
   <data name="Settings_StartupDesc" xml:space="preserve"><value>Lancer Forza Telemetry Splitter automatiquement à la connexion à Windows.</value></data>
+  <data name="Settings_AutoSplit" xml:space="preserve"><value>Démarrer la répartition automatiquement au lancement d'un jeu Forza</value></data>
+  <data name="Settings_AutoSplitDesc" xml:space="preserve"><value>Détecte Forza Horizon 4, 5 et 6 ainsi que Forza Motorsport, démarre la répartition au lancement du jeu et revient à l'inactivité à sa fermeture.</value></data>
   <data name="Settings_UnitDesc" xml:space="preserve"><value>Unités de la vitesse affichée dans l'overlay et la barre d'état.</value></data>
   <data name="Settings_LangDesc" xml:space="preserve"><value>Langue d'affichage de l'application.</value></data>
   <data name="Main_BackgroundNote" xml:space="preserve"><value>Vous pouvez fermer cette fenêtre, l'outil restera ouvert en arrière-plan.</value></data>
@@ -108,6 +112,7 @@
 
   <data name="Status_Stopped" xml:space="preserve"><value>Arrêté — aucune télémétrie reçue</value></data>
   <data name="Status_WaitingForForza" xml:space="preserve"><value>En cours — en attente de la télémétrie de Forza (réglez Data Out sur {0}:{1})</value></data>
+  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} détecté — en attente de la télémétrie (activez Data Out dans les paramètres HUD du jeu)</value></data>
   <data name="Status_Connected" xml:space="preserve"><value>Réception depuis {0} — {1} paquets/s — Course {2} — {3}</value></data>
   <data name="Status_RaceOn" xml:space="preserve"><value>ACTIVE</value></data>
   <data name="Status_RaceOff" xml:space="preserve"><value>INACTIVE</value></data>
@@ -149,4 +154,26 @@
 Forza Telemetry Splitter a besoin de son propre port libre pour recevoir les données de Forza. Un autre outil (ou une seconde copie du répartiteur) occupe ce port.
 
 Solution : ouvrez le répartiteur et changez son port d'écoute pour un port libre, puis réglez le port Data Out de Forza sur la même valeur. Le port par défaut {0} est normalement libre.</value></data>
+
+  <data name="Settings_Companions" xml:space="preserve"><value>Applications compagnons</value></data>
+  <data name="Settings_CompanionsDesc" xml:space="preserve"><value>Outils à lancer au démarrage du répartiteur (manuel ou automatique). Chaque application activée démarre si elle n'est pas déjà en cours d'exécution. Le répartiteur les démarre, mais ne les ferme jamais.</value></data>
+  <data name="Comp_AddTitle" xml:space="preserve"><value>Ajouter une application compagnon</value></data>
+  <data name="Comp_EditTitle" xml:space="preserve"><value>Modifier l'application compagnon</value></data>
+  <data name="Comp_Name" xml:space="preserve"><value>Nom :</value></data>
+  <data name="Comp_Path" xml:space="preserve"><value>Programme :</value></data>
+  <data name="Comp_Browse" xml:space="preserve"><value>Parcourir...</value></data>
+  <data name="Comp_Arguments" xml:space="preserve"><value>Arguments :</value></data>
+  <data name="Comp_Enabled" xml:space="preserve"><value>Activé</value></data>
+  <data name="Comp_BatNote" xml:space="preserve"><value>Les fichiers batch ne peuvent pas être vérifiés pour détecter les doublons et peuvent être relancés à chaque démarrage du répartiteur.</value></data>
+  <data name="Comp_MissingName" xml:space="preserve"><value>Veuillez saisir un nom.</value></data>
+  <data name="Comp_MissingPath" xml:space="preserve"><value>Veuillez choisir un programme à lancer (un fichier .exe ou .bat).</value></data>
+  <data name="Comp_FileFilter" xml:space="preserve"><value>Programmes et scripts (*.exe;*.bat)|*.exe;*.bat|Tous les fichiers (*.*)|*.*</value></data>
+  <data name="Comp_RemoveTitle" xml:space="preserve"><value>Supprimer l'application compagnon</value></data>
+  <data name="Col_Path" xml:space="preserve"><value>Programme</value></data>
+  <data name="Col_Args" xml:space="preserve"><value>Arguments</value></data>
+  <data name="Error_CompanionLaunch" xml:space="preserve"><value>Impossible de lancer l'application compagnon « {0} ».
+
+{1}
+
+Vérifiez le chemin dans Paramètres &gt; Applications compagnons. Le répartiteur et vos autres outils ne sont pas affectés.</value></data>
 </root>

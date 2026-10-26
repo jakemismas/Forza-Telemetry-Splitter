@@ -54,6 +54,8 @@
   <data name="Tray_SetupGuide" xml:space="preserve"><value>セットアップガイド…</value></data>
   <data name="Tray_CheckUpdates" xml:space="preserve"><value>更新を確認…</value></data>
   <data name="Tray_Exit" xml:space="preserve"><value>終了</value></data>
+  <data name="Tray_GameDetected" xml:space="preserve"><value>{0} を検出しました。テレメトリを自動的に分配します。</value></data>
+  <data name="Tray_GameClosed" xml:space="preserve"><value>Forza が終了しました。待機状態に戻りましたが、引き続き待ち受けています。</value></data>
 
   <data name="Main_Title" xml:space="preserve"><value>Forza Telemetry Splitter</value></data>
   <data name="Main_Add" xml:space="preserve"><value>追加</value></data>
@@ -76,6 +78,8 @@
   <data name="Tab_Overlay" xml:space="preserve"><value>オーバーレイ</value></data>
   <data name="Tab_Settings" xml:space="preserve"><value>設定</value></data>
   <data name="Settings_StartupDesc" xml:space="preserve"><value>Windows へのサインイン時に Forza Telemetry Splitter を自動的に起動します。</value></data>
+  <data name="Settings_AutoSplit" xml:space="preserve"><value>Forza のゲームが実行中は自動的に分配を開始する</value></data>
+  <data name="Settings_AutoSplitDesc" xml:space="preserve"><value>Forza Horizon 4、5、6 と Forza Motorsport を検出し、ゲーム起動時に分配を開始、終了時に待機状態へ戻ります。</value></data>
   <data name="Settings_UnitDesc" xml:space="preserve"><value>オーバーレイとステータスに表示する速度の単位。</value></data>
   <data name="Settings_LangDesc" xml:space="preserve"><value>アプリの表示言語。</value></data>
   <data name="Main_BackgroundNote" xml:space="preserve"><value>このウィンドウは閉じても大丈夫です。ツールはバックグラウンドで動作し続けます。</value></data>
@@ -108,6 +112,7 @@
 
   <data name="Status_Stopped" xml:space="preserve"><value>停止中 — テレメトリ未受信</value></data>
   <data name="Status_WaitingForForza" xml:space="preserve"><value>実行中 — Forza のテレメトリ送信を待機中（Data Out を {0}:{1} に設定）</value></data>
+  <data name="Status_GameDetectedWaiting" xml:space="preserve"><value>{0} を検出 — テレメトリを待機中（ゲームの HUD 設定で Data Out を有効化）</value></data>
   <data name="Status_Connected" xml:space="preserve"><value>{0} から受信中 — {1} パケット/秒 — レース {2} — {3}</value></data>
   <data name="Status_RaceOn" xml:space="preserve"><value>オン</value></data>
   <data name="Status_RaceOff" xml:space="preserve"><value>オフ</value></data>
@@ -149,4 +154,26 @@
 Forza Telemetry Splitter は Forza から受信するために専用の空きポートが必要です。別のツール（またはこのアプリの別のコピー）がこのポートを使用しています。
 
 対処: このアプリを開いて待機ポートを空いている番号に変更し、Forza の Data Out ポートも同じ値に設定してください。既定の {0} は通常空いています。</value></data>
+
+  <data name="Settings_Companions" xml:space="preserve"><value>コンパニオンアプリ</value></data>
+  <data name="Settings_CompanionsDesc" xml:space="preserve"><value>このアプリの起動時（手動または自動）に合わせて起動するツールです。有効になっている各アプリは、まだ実行されていない場合に起動します。このアプリはそれらを起動しますが、終了させることはありません。</value></data>
+  <data name="Comp_AddTitle" xml:space="preserve"><value>コンパニオンアプリを追加</value></data>
+  <data name="Comp_EditTitle" xml:space="preserve"><value>コンパニオンアプリを編集</value></data>
+  <data name="Comp_Name" xml:space="preserve"><value>名前:</value></data>
+  <data name="Comp_Path" xml:space="preserve"><value>プログラム:</value></data>
+  <data name="Comp_Browse" xml:space="preserve"><value>参照...</value></data>
+  <data name="Comp_Arguments" xml:space="preserve"><value>引数:</value></data>
+  <data name="Comp_Enabled" xml:space="preserve"><value>有効</value></data>
+  <data name="Comp_BatNote" xml:space="preserve"><value>バッチファイルは重複を確認できないため、このアプリの起動ごとに再起動される場合があります。</value></data>
+  <data name="Comp_MissingName" xml:space="preserve"><value>名前を入力してください。</value></data>
+  <data name="Comp_MissingPath" xml:space="preserve"><value>起動するプログラムを選択してください（.exe または .bat ファイル）。</value></data>
+  <data name="Comp_FileFilter" xml:space="preserve"><value>プログラムとスクリプト (*.exe;*.bat)|*.exe;*.bat|すべてのファイル (*.*)|*.*</value></data>
+  <data name="Comp_RemoveTitle" xml:space="preserve"><value>コンパニオンアプリを削除</value></data>
+  <data name="Col_Path" xml:space="preserve"><value>プログラム</value></data>
+  <data name="Col_Args" xml:space="preserve"><value>引数</value></data>
+  <data name="Error_CompanionLaunch" xml:space="preserve"><value>コンパニオンアプリ「{0}」を起動できませんでした。
+
+{1}
+
+設定 &gt; コンパニオンアプリ でパスを確認してください。このアプリと他のツールへの影響はありません。</value></data>
 </root>
