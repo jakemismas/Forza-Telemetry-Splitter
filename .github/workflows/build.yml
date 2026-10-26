@@ -33,6 +33,9 @@ jobs:
       - name: Verify engine (headless)
         run: dotnet run --project tests/EngineTest -c Release
 
+      - name: Verify translations (every key in every locale)
+        run: dotnet run --project tests/LocaleTest -c Release
+
       - name: Publish single-file exe
         run: dotnet publish src/ForzaTelemetrySplitter -c Release -r win-x64 -o publish
 
