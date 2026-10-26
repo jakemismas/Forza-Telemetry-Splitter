@@ -1,8 +1,14 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Resources;
 using ForzaTelemetrySplitter.Resources;
 
 // Verifies the localization layer against the real Strings accessor + satellite assemblies:
-//  - each supported culture returns translated (non-English, non-empty) text
+//  - every key in the neutral resource (Strings.resx) is present, non-empty, in every locale
+//  - supported cultures also return translated (non-English, non-empty) text for spot-checked keys
 //  - an unsupported culture falls back to English
 //  - placeholder-formatting helpers produce the expected substitutions per culture
 
@@ -34,14 +40,47 @@ void Check(string culture, bool mustDifferFromEnglish)
     if (!ok) failures++;
 }
 
-Console.WriteLine("[Test 1] Supported cultures return non-empty, translated text");
+Console.WriteLine("[Test 1] Every key in Strings.resx is present and non-empty in every locale");
+{
+    // Walk each satellite resource set directly (tryParents:false) so a key that is only
+    // reachable by falling back to English is caught as missing, not silently passed.
+    var rm = new ResourceManager("ForzaTelemetrySplitter.Resources.Strings", typeof(Strings).Assembly);
+    var neutralSet = rm.GetResourceSet(CultureInfo.InvariantCulture, true, false)
+        ?? throw new InvalidOperationException("Could not load the neutral Strings.resx resource set.");
+    var canonicalKeys = neutralSet.Cast<DictionaryEntry>()
+        .Select(e => (string)e.Key)
+        .OrderBy(k => k, StringComparer.Ordinal)
+        .ToList();
+    Console.WriteLine($"  canonical key count: {canonicalKeys.Count}");
+
+    foreach (var culture in new[] { "ja", "fr", "de", "es" })
+    {
+        var set = rm.GetResourceSet(CultureInfo.GetCultureInfo(culture), true, false);
+        var missing = new List<string>();
+        var empty = new List<string>();
+        foreach (var key in canonicalKeys)
+        {
+            string? value = set?.GetString(key);
+            if (value is null) missing.Add(key);
+            else if (string.IsNullOrWhiteSpace(value)) empty.Add(key);
+        }
+        bool ok = missing.Count == 0 && empty.Count == 0;
+        int present = canonicalKeys.Count - missing.Count - empty.Count;
+        Console.WriteLine($"  {culture,-3}: {present}/{canonicalKeys.Count} keys present and non-empty -> {(ok ? "PASS" : "FAIL")}");
+        if (missing.Count > 0) Console.WriteLine($"       missing ({missing.Count}): {string.Join(", ", missing)}");
+        if (empty.Count > 0) Console.WriteLine($"       empty ({empty.Count}): {string.Join(", ", empty)}");
+        if (!ok) failures++;
+    }
+}
+
+Console.WriteLine("\n[Test 2] Supported cultures return non-empty, translated text");
 Check("en", mustDifferFromEnglish: false);
 Check("ja", mustDifferFromEnglish: true);
 Check("fr", mustDifferFromEnglish: true);
 Check("de", mustDifferFromEnglish: true);
 Check("es", mustDifferFromEnglish: true);
 
-Console.WriteLine("\n[Test 1b] New v0.6 strings load and differ per culture");
+Console.WriteLine("\n[Test 3] New v0.6 strings load and differ per culture");
 {
     bool ok = true;
     foreach (var c in new[] { "ja", "fr", "de", "es" })
@@ -58,7 +97,7 @@ Console.WriteLine("\n[Test 1b] New v0.6 strings load and differ per culture");
     if (!ok) failures++;
 }
 
-Console.WriteLine("\n[Test 2] Unsupported culture (it) falls back to English");
+Console.WriteLine("\n[Test 4] Unsupported culture (it) falls back to English");
 {
     CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("it");
     string itNoData = Strings.Overlay_NoData;
@@ -69,7 +108,7 @@ Console.WriteLine("\n[Test 2] Unsupported culture (it) falls back to English");
     if (!ok) failures++;
 }
 
-Console.WriteLine("\n[Test 3] Placeholder formatting works per culture");
+Console.WriteLine("\n[Test 5] Placeholder formatting works per culture");
 {
     CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("ja");
     string s = Strings.Status_Connected("Forza Horizon", 60, Strings.Status_RaceOn, "Gear 4   112 mph");
@@ -85,7 +124,7 @@ Console.WriteLine("\n[Test 3] Placeholder formatting works per culture");
     if (!eok) failures++;
 }
 
-Console.WriteLine("\n[Test 4] StartupRegistration enable/disable (HKCU Run)");
+Console.WriteLine("\n[Test 6] StartupRegistration enable/disable (HKCU Run)");
 {
     bool wasEnabled = ForzaTelemetrySplitter.Config.StartupRegistration.IsEnabled();
     try
